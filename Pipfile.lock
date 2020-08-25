@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "302c6a05ad27edc02780a64a7c17f287cbbea38f04e050f3b4bd1b1612a9cefa"
+            "sha256": "ccc2b0213911d568a15dd29bb9412fe9b1513818e8abbf26e3628afec715e27f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -86,6 +86,13 @@
             ],
             "index": "pypi",
             "version": "==1.1.1"
+        },
+        "webpack-manifest": {
+            "hashes": [
+                "sha256:dd10896ae8aa95a0146011ca23f019ae2b38a94e279b646ed12355cab7d9cf0d"
+            ],
+            "index": "pypi",
+            "version": "==2.1.1"
         },
         "werkzeug": {
             "hashes": [

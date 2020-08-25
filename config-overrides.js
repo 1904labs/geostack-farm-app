@@ -10,14 +10,6 @@ module.exports = {
         paths.testsSetup = path.resolve(__dirname, 'app/src/setupTests.js');
         paths.proxySetup = path.resolve(__dirname, 'app/src/setupProxy.js');
         paths.swSrc = path.resolve(__dirname, 'app/src/service-worker.js');
-        //paths.publicUrlOrPath = path.resolve(__dirname, 'app/src/service-worker.js');
         return paths;
     }
-    /*
-    webpack: function (config, env) {
-        config.output.filename = 'js/[name].[contenthash:8].js'
-        config.output.chunkFilename = 'js/[name].[contenthash:8].js'
-        return config;
-      }
-      */
 }
