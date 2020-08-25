@@ -18,6 +18,7 @@ class App extends Component {
     map.addLayer(layer)
   }
   
+
   addLayerFromFile = (file) => {
     const fileData = new FileReader()
     fileData.fileName = file.name
