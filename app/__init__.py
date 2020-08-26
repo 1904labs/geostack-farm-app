@@ -1,10 +1,11 @@
-from flask import Flask, Blueprint
-from flask import Blueprint, render_template
+from flask import Flask
 
 
 def create_app():
-    flask_app = Flask( __name__, static_folder='./dist')
+    flask_app = Flask(__name__, static_folder='./dist')
     with flask_app.app_context():
         from app import routes
+        from app.api import api_bp
+        flask_app.register_blueprint(api_bp, url_prefix='/api')
 
     return flask_app
