@@ -20,7 +20,7 @@ LABEL maintainer="gjunge@1904labs.com" \
 
 RUN set -ex && \
     apk add --update --no-cache bash nodejs npm &&\
-    pip3 install pipenv gunicorn
+    pip3 install pipenv
 
 COPY . /opt/project
 WORKDIR /opt/project

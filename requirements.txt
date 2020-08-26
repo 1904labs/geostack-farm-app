@@ -1,8 +1,15 @@
--i https://pypi.org/simple
+aniso8601==8.0.0
+attrs==20.1.0
 click==7.1.2
-flask==1.1.2
+Flask==1.1.2
+flask-restx==0.2.0
+gunicorn==20.0.4
 itsdangerous==1.1.0
-jinja2==2.11.2
-markupsafe==1.1.1
+Jinja2==2.11.2
+jsonschema==3.2.0
+MarkupSafe==1.1.1
+pyrsistent==0.16.0
+pytz==2020.1
+six==1.15.0
 webpack-manifest==2.1.1
-werkzeug==1.0.1
+Werkzeug==1.0.1
