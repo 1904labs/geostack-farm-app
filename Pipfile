@@ -12,6 +12,7 @@ webpack-manifest = "*"
 flask-restx = "*"
 pip = "*"
 gunicorn = "*"
+requests = "*"
 
 [dev-packages]
 pylint = "*"

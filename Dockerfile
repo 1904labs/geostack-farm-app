@@ -22,12 +22,20 @@ RUN set -ex && \
     apk add --update --no-cache bash nodejs npm &&\
     pip3 install pipenv
 
-COPY . /opt/project
 WORKDIR /opt/project
+COPY Pipfile* config-overrides.js *.json ./
 
+# install environments
 RUN pipenv install --deploy --system 
 RUN npm ci 
+
+# avoid npm builds unless needed
+COPY app/src app/src
+COPY app/public app/public
+RUN ls -R app
 RUN npm run build 
+
+COPY ./ ./
 CMD [ "gunicorn", \
     "app:create_app('production')", \
     "--workers", "15", \

@@ -14,7 +14,7 @@
   },
   "scripts": {
     "setup": "npm install && npm run build && npm run start",
-    "start": "concurrently \"flask run --debugger --reload --port=8080\" \"open-cli http://localhost:8080\"",
+    "start": "concurrently \"flask run --debugger --reload --port=5000\" \"open-cli http://localhost:5000\"",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"

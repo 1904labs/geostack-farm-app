@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+    # postgis:
+    #     image: 1904labs/postgis:latest
+    #     volumes:
+    #         - postgresql:/var/lib/postgresql
+    #     ports:
+    #         - "5432:5432"
+    #     healthcheck:
+    #         test: ["CMD-SHELL", "pg_isready -U postgres"]
+    #         interval: 10s
+    #         timeout: 5s
+    #         retries: 5
+
+    geoserver:
+        image: 1904labs/geoserver:latest
+        volumes:
+            - geoserver:/opt/geoserver/data_dir
+        ports:
+            - "8081:8080"
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://geoserver:8080"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+
+    app:
+        image: local/geohack-collab-project:latest
+        build:
+            context: .
+        ports:
+            - "8080:8080"
+        environment:
+            - GEOSERVER_URL=http://geoserver:8080 
+
+volumes:
+    postgresql:
+    geoserver:

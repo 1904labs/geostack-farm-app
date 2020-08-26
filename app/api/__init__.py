@@ -1,5 +1,6 @@
-from . import api
+from flask import Blueprint
+
+api_bp = Blueprint('api', __name__)
+
 from . import geoserver
 
-api_bp = api.bp
-api_rp = api.rp
