@@ -24,7 +24,7 @@ npm run build
 ```
 
 __4. Run your app__
-This will lauch the flask dev server on http://localhost:8080
+This will lauch the flask dev server on http://localhost:5000
 A browser window should open automatically
 ```bash
 npm run start
