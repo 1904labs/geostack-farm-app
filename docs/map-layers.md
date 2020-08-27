@@ -1,13 +1,8 @@
 ## Interacting with the map
 
-If the image is not running launch it with  
-
-```bash
-docker run -p 8000:80 1904labs/ol-kit:latest  
-```
-
-Once the image is running, to access the map open you browser and navigate to:
-<http://localhost:8000>
+Once the image is running, to access the map open you browser and navigate to the appropriate url:
+(for exxample if running from the dev server)
+<http://localhost:5000>
 
 You should see the map centered on the United States:  
 ![initial](https://raw.githubusercontent.com/1904labs/docker-ol-kit/master/images/initial.png)  
