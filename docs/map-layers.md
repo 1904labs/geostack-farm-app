@@ -7,7 +7,7 @@ filename: map-layers.md
 ## Interacting with the map
 
 Once the image is running, to access the map open you browser and navigate to the appropriate url:
-(for exxample if running from the dev server)
+(for exxample if running from the dev server)  
 <http://localhost:5000>
 
 You should see the map centered on the United States:  
