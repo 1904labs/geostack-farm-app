@@ -1,3 +1,9 @@
+---
+title: Geospatial Hackathon Collaborative project
+layout: default
+filename: index.md 
+--- 
+
 ## Prerequisites
 1. pipenv: Install pipenv via the instructions here:
 https://pypi.org/project/pipenv/
