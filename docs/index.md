@@ -1,6 +1,3 @@
-# Geospatial hackathon collaboration project
-Flask application with react frontend
-
 ## Prerequisites
 1. pipenv: Install pipenv via the instructions here:
 https://pypi.org/project/pipenv/

@@ -21,6 +21,7 @@
 title: Geospatial Hackathon Collaborative project
 email: 1904labs@1904labs.com
 description: >- # this means to ignore newlines until "baseurl:"
+Flask application with react frontend
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
