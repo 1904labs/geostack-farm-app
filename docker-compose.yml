@@ -20,7 +20,7 @@ services:
         ports:
             - "8081:8080"
         healthcheck:
-            test: ["CMD", "curl", "--fail", "http://geoserver:8080"]
+            test: ["CMD", "curl", "--fail", "http://geoserver:8080/geoserver/"]
             interval: 30s
             timeout: 10s
             retries: 3
@@ -32,7 +32,7 @@ services:
         ports:
             - "8080:8080"
         environment:
-            - GEOSERVER_URL=http://geoserver:8080 
+            - GEOSERVER_URL=http://geoserver:8080/geoserver/ 
 
 volumes:
     postgresql:
