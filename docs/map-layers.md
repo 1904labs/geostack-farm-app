@@ -1,74 +1,72 @@
----
-title: map-layers
-layout: default
-filename: map-layers.md
---- 
+# docker-ol-kit
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This container enables running a standalone ol-kit app with the ability to dynamically import layers from local files.  
 
-## Available Scripts
+## ol-kit docs
 
-In the project directory, you can run:
+<https://github.com/MonsantoCo/ol-kit>  
 
-### `npm start`
+## To run this image  
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```bash
+docker run -p 8000:80 1904labs/ol-kit:latest  
+```
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+## To build this image locally
 
-### `npm test`
+- clone this repository  
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+docker build . -t ol-kit:latest  
+docker run -p 8000:80 ol-kit:latest  
+```
 
-### `npm run build`
+## React developers
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+If you want to run ol-kit in the npm test server in order to make and test  changes to the React app, you can:  
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+- install nodejs and npm  
+- clone this repository  
+- cd into the "app" directory  
+- npm start  
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Interacting with the map
 
-### `npm run eject`
+If the image is not running launch it with  
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+docker run -p 8000:80 1904labs/ol-kit:latest  
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Once the image is running, to access the map open you browser and navigate to:
+<http://localhost:8000>
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+You should see the map centered on the United States:  
+![initial](https://raw.githubusercontent.com/1904labs/docker-ol-kit/master/images/initial.png)  
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+ Next select the layers panel icon on the right side of the screen to open the layers panel  
+![panel open](https://raw.githubusercontent.com/1904labs/docker-ol-kit/master/images/panelopen.png)  
 
-## Learn More
+ To import a layer first you will need something to import, for this example I downloaded these two files:  
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- From: <https://eric.clst.org/tech/usgeojson/>
+  <https://eric.clst.org/assets/wiki/uploads/Stuff/gz_2010_us_040_00_500k.json>  
+- From: <https://datahub.io/core/geo-nuts-administrative-boundaries#data>
+  <https://datahub.io/core/geo-nuts-administrative-boundaries/r/nuts_rg_60m_2013_lvl_1.geojson1>  
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Once you have those files (or any other geojson or kml files you wish to import), Click the three button menu in the layers panel and select import.  
+![menu open](https://raw.githubusercontent.com/1904labs/docker-ol-kit/master/images/menuopen.png)  
 
-### Code Splitting
+After selecting import you can navigate in your computers file manager to the location you downloaded the files to and select the file gz_2010_us_040_00_500k.json, this will load the features layer to the map.  
+![loaded1](https://raw.githubusercontent.com/1904labs/docker-ol-kit/master/images/loaded1.png)  
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+To zoom to the extent represented in the layer, click the three button menu next to that layer and select "Zoom to Layer Extent"  
+![zoom select](https://raw.githubusercontent.com/1904labs/docker-ol-kit/master/images/zoomselect.png)  
 
-### Analyzing the Bundle Size
+This should zoom you out to a view akin to this:  
+![zoomed](https://raw.githubusercontent.com/1904labs/docker-ol-kit/master/images/zoomed.png)  
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+Now to add the second layer open the layer panel menu again and select import, navigate to where you downloaded the files to, and select the file "nuts_rg_60m_2013_lvl_1.geojson1", this should add the new layer to the map:  
+![loaded2](https://raw.githubusercontent.com/1904labs/docker-ol-kit/master/images/loaded2.png)  
 
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+From here you can experiment with adding and removing any geojson or kml files that you have access to, there are plenty available out on the web.  
