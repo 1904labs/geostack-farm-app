@@ -1,20 +1,29 @@
 version: '3.8'
 
 services:
-    # postgis:
-    #     image: 1904labs/postgis:latest
-    #     volumes:
-    #         - postgresql:/var/lib/postgresql
-    #     ports:
-    #         - "5432:5432"
-    #     healthcheck:
-    #         test: ["CMD-SHELL", "pg_isready -U postgres"]
-    #         interval: 10s
-    #         timeout: 5s
-    #         retries: 5
+    postgis:
+        image: postgis/postgis:12-3.0-alpine
+        environment:
+            - POSTGRES_DB=gis
+            - POSTGRES_PASSWORD=!geohack!
+        volumes:
+            - postgresql:/var/lib/postgresql
+        ports:
+            - "5432:5432"
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
     geoserver:
         image: 1904labs/geoserver:latest
+        environment:
+            - POSTGRES_DB=gis
+            - POSTGRES_PASSWORD=!geohack!
+            - GEOSERVER_ADMIN_USER=admin
+            - GEOSERVER_ADMIN_PASSWORD=!geohack!
+            - GEOSERVER_DATA_DIR=/opt/geoserver/data_dir
         volumes:
             - geoserver:/opt/geoserver/data_dir
         ports:
@@ -27,12 +36,12 @@ services:
 
     app:
         image: local/geohack-collab-project:latest
+        environment:
+            - GEOSERVER_URL=http://geoserver:8080/geoserver/ 
         build:
             context: .
         ports:
             - "8080:8080"
-        environment:
-            - GEOSERVER_URL=http://geoserver:8080/geoserver/ 
 
 volumes:
     postgresql:
