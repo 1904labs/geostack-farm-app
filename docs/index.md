@@ -11,7 +11,7 @@ https://pypi.org/project/pipenv/
 https://www.npmjs.com/get-npm
 
 ## Setup  
-__1. clone the repository
+__1. clone the repository__
 ```bash
 git clone git@github.com:1904labs/geohack-collab-project.git
 ```
