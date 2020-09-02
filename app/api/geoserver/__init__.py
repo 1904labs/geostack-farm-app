@@ -85,4 +85,3 @@ def get_geoserver_proxy(path: str = '') -> str:
         return geoserver_api.get(path).json()
     except json.JSONDecodeError:
         return abort(400)
-

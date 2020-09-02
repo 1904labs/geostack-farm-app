@@ -34,7 +34,8 @@ services:
 
     app:
         image: local/geohack-collab-project:latest
-        command: ["flask", "run", "--debugger", "--reload", "--host=0.0.0.0", "--port=8080"]
+        # uncomment to use development server in container
+        # command: ["flask", "run", "--debugger", "--reload", "--host=0.0.0.0", "--port=8080"]
         environment:
             - GEOSERVER_URL=http://geoserver:8080 
             - GEOSERVER_WORKSPACE=geohack

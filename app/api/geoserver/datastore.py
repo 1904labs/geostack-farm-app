@@ -29,12 +29,12 @@ class GeoserverDatastore(GeoserverEndpt):
     def create(self) -> bool:
         data = {"dataStore": {"name": self.name, "connectionParameters": {
             "entry": [
-                '{"@key":"host","$":"' + self.host + '"}',
-                '{"@key":"port","$":"' + self.port + '"}',
-                '{"@key":"database","$":"' + self.name + '"}',
-                '{"@key":"user","$":"' + self.user + '"}',
-                '{"@key":"passwd","$":"' + self.pwd + '"}',
-                '{"@key":"dbtype","$":"postgis"}'
+                {"@key": "host", "$": self.host},
+                {"@key": "port", "$": self.port},
+                {"@key": "database", "$": self.name},
+                {"@key": "user", "$": self.user},
+                {"@key": "passwd", "$": self.pwd},
+                {"@key": "dbtype", "$": "postgis"}
             ]
         }}}
         response = self.parent.post(self.endpt, data=data)
