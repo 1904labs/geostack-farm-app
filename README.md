@@ -1,5 +1,7 @@
 # Geospatial hackathon collaboration project
-Flask application with react frontend
+Flask application with react frontend  
+See extended documentation here:  
+https://1904labs.github.io/geohack-collab-project/index.html  
 
 ## Prerequisites
 1. pipenv: Install pipenv via the instructions here:
