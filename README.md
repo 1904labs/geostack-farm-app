@@ -3,9 +3,10 @@ Flask application with react frontend
 
 ## Prerequisites
 1. pipenv: Install pipenv via the instructions here:
-https://pypi.org/project/pipenv/
-2. node/npm: Install node.js and npm per the instructions here:
-https://www.npmjs.com/get-npm
+https://pypi.org/project/pipenv/  
+(Note: prefered install method is via your package manager not pip)  
+2. node/npm: Install node.js and npm per the instructions here:  
+https://www.npmjs.com/get-npm  
 
 ## Setup
 __1. Install your python environement__
