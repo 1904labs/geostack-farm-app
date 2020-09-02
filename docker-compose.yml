@@ -3,8 +3,9 @@ version: '3.8'
 services:
     postgis:
         image: postgis/postgis:12-3.0-alpine
-        environment:
+        environment: 
             - POSTGRES_DB=gis
+            - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=!geohack!
         volumes:
             - postgresql:/var/lib/postgresql
@@ -17,15 +18,12 @@ services:
             retries: 5
 
     geoserver:
-        image: 1904labs/geoserver:latest
+        image: 1904labs/geoserver:2.17.1
         environment:
-            - POSTGRES_DB=gis
-            - POSTGRES_PASSWORD=!geohack!
             - GEOSERVER_ADMIN_USER=admin
             - GEOSERVER_ADMIN_PASSWORD=!geohack!
-            - GEOSERVER_DATA_DIR=/opt/geoserver/data_dir
         volumes:
-            - geoserver:/opt/geoserver/data_dir
+            - geoserver:/opt/tomcat/webapps/geoserver/data
         ports:
             - "8081:8080"
         healthcheck:
@@ -36,8 +34,17 @@ services:
 
     app:
         image: local/geohack-collab-project:latest
+        command: ["flask", "run", "--debugger", "--reload", "--host=0.0.0.0", "--port=8080"]
         environment:
-            - GEOSERVER_URL=http://geoserver:8080/geoserver/ 
+            - GEOSERVER_URL=http://geoserver:8080 
+            - GEOSERVER_WORKSPACE=geohack
+            - GEOSERVER_ADMIN_USER=admin
+            - GEOSERVER_ADMIN_PASSWORD=!geohack!
+            - POSTGRES_HOST=postgis
+            - POSTGRES_PORT=5432
+            - POSTGRES_DB=gis
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=!geohack!
         build:
             context: .
         ports:
