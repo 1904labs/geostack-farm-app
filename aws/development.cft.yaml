@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: '1904labs Geospatial Hackathon Cloudformation Template'
+Resources:
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: m4.xlarge
+      ImageId: ami-08b26b905b0d17561
+      KeyName: hackathon
+      SecurityGroups:
+      - Ref: SshSecurityGroup
+      - Ref: AppSecurityGroup
+      - Ref: GsSecurityGroup
+      - Ref: PgSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y
+          yum install -y git
+          git clone https://github.com/1904labs/geohack-collab-project.git
+          cd geohack-collab-project
+          docker-compose build
+          docker-compose up -d
+
+  SshSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: '0.0.0.0/0'
+
+  PgSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable Postgis access via port 5432
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '5432'
+        ToPort: '5432'
+        CidrIp: '0.0.0.0/0'
+
+  GsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable GeoServer access via port 8080
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '8081'
+        ToPort: '8081'
+        CidrIp: '0.0.0.0/0'
+
+  AppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable webapp access via port 8080
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '8080'
+        ToPort: '8080'
+        CidrIp: '0.0.0.0/0'
