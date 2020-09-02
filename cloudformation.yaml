@@ -1,0 +1,509 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Geospatial Hackathon Collaboratative project
+Parameters:
+  Namespace:
+    Type: String
+    Default: GeoHackCollab
+    
+Mappings:
+  SubnetConfig:
+    VPC:
+      CIDR: '10.0.0.0/16'
+    PublicOne:
+      CIDR: '10.0.0.0/24'
+    PublicTwo:
+      CIDR: '10.0.1.0/24'
+    PrivateOne:
+      CIDR: '10.0.2.0/24'
+    PrivateTwo:
+      CIDR: '10.0.3.0/24'
+            
+Resources:
+  # VPC in which containers will be networked.
+  # It has two public subnets, and two private subnets.
+  # We distribute the subnets across the first two available subnets
+  # for the region, for high availability.
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+
+    # Two public subnets, where containers can have public IP addresses
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOne', 'CIDR']
+      MapPublicIpOnLaunch: true
+  
+  PublicSubnetTwo:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicTwo', 'CIDR']
+      MapPublicIpOnLaunch: true
+
+  # Two private subnets where containers will only have private
+  # IP addresses, and will only be reachable by other members of the
+  # VPC
+  PrivateSubnetOne:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateOne', 'CIDR']
+      
+  PrivateSubnetTwo:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateTwo', 'CIDR']
+
+  # Setup networking resources for the public subnets. Containers
+  # in the public subnets have public IP addresses and the routing table
+  # sends network traffic via the internet gateway.
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: VPC
+    
+  GatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    DependsOn: InternetGateway
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+      
+  # Attaching a Internet Gateway to route table makes it public.  
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    DependsOn: VPC
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: 
+      - GatewayAttachment
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+      
+  # Attaching a public route table makes a subnet public.
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: 
+      - PublicSubnetOne
+      - PublicRouteTable
+    Properties:
+      SubnetId: !Ref 'PublicSubnetOne'
+      RouteTableId: !Ref 'PublicRouteTable'
+
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn:
+      - PublicSubnetTwo
+      - PublicRouteTable
+    Properties:
+      SubnetId: !Ref 'PublicSubnetTwo'
+      RouteTableId: !Ref 'PublicRouteTable'
+
+  # Setup networking resources for the private subnets. Containers
+  # in these subnets have only private IP addresses, and must use a NAT
+  # gateway to talk to the internet. We launch two NAT gateways, one for
+  # each private subnet.
+  NatGatewayOneAttachment:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGatewayTwoAttachment:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachment
+    Properties:
+      Domain: vpc
+
+  #NAT gateway resource creates a network address translation (NAT) gateway in the specified public subnet. 
+  #Use a NAT gateway to allow instances in a private subnet to connect to the Internet or to other AWS services, 
+  #but prevent the Internet from initiating a connection with those instances.
+  NatGatewayOne:
+    Type: AWS::EC2::NatGateway
+    DependsOn: PublicSubnetOneRouteTableAssociation
+    Properties:
+      AllocationId: !GetAtt NatGatewayOneAttachment.AllocationId
+      SubnetId: !Ref PublicSubnetOne
+
+  NatGatewayTwo:
+    Type: AWS::EC2::NatGateway
+    DependsOn: PublicSubnetTwoRouteTableAssociation
+    Properties:
+      AllocationId: !GetAtt NatGatewayTwoAttachment.AllocationId
+      SubnetId: !Ref PublicSubnetTwo
+  
+  # Each private subnet gets to go through a NAT to the outside internet. 
+  PrivateRouteTableOne:
+    Type: AWS::EC2::RouteTable
+    DependsOn: PrivateSubnetOne
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PrivateRouteOne:
+    Type: AWS::EC2::Route
+    DependsOn: PrivateRouteTableOne
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableOne
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayOne
+
+  PrivateRouteTableOneAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: PrivateRouteOne
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableOne
+      SubnetId: !Ref PrivateSubnetOne
+  
+  PrivateRouteTableTwo:
+    Type: AWS::EC2::RouteTable
+    DependsOn: PrivateSubnetTwo
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PrivateRouteTwo:
+    Type: AWS::EC2::Route
+    DependsOn: PrivateRouteTableTwo
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableTwo
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayTwo
+      
+  PrivateRouteTableTwoAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: PrivateRouteTwo
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableTwo
+      SubnetId: !Ref PrivateSubnetTwo
+            
+# These are the values output by the CloudFormation template. Be careful
+# about changing any of them, because of them are exported with specific
+# names so that the other task related CF templates can use them.
+Outputs:
+  VpcId:
+    Description: The ID of the VPC that this stack is deployed in
+    Value: !Ref 'VPC'
+    Export:
+      Name: !Join [ ':', [ !Ref 'Namespace', 'VpcId' ] ]
+  PublicSubnetOne:
+    Description: Public subnet one
+    Value: !Ref 'PublicSubnetOne'
+    Export:
+      Name: !Join [ ':', [ !Ref 'Namespace', 'PublicSubnetOne' ] ]
+  PublicSubnetTwo:
+    Description: Public subnet two
+    Value: !Ref 'PublicSubnetTwo'
+    Export:
+      Name: !Join [ ':', [ !Ref 'Namespace', 'PublicSubnetTwo' ] ]
+  PrivateSubnetOne:
+    Description: Private subnet one
+    Value: !Ref 'PrivateSubnetOne'
+    Export:
+      Name: !Join [ ':', [ !Ref 'Namespace', 'PrivateSubnetOne' ] ]
+  PrivateSubnetTwo:
+    Description: Private subnet two
+    Value: !Ref 'PrivateSubnetTwo'
+    Export:
+      Name: !Join [ ':', [ !Ref 'Namespace', 'PrivateSubnetTwo' ] ]
+
+  # A security group for the containers we will run in Fargate.
+  # Rules are added to this security group based on what ingress you
+  # add for the cluster.
+  ContainerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Access to the Fargate containers
+      VpcId: 
+        Fn::ImportValue: !Sub '${Namespace}:VpcId'
+      
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['', [/ecs/, !Ref 'AWS::StackName', TaskDefinition]]
+      
+  EcsCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: !Join
+      - ''
+      - - !Ref 'AWS::StackName'
+        - 'Cluster'
+
+  # This is a role which is used by the ECS tasks themselves.
+  EcsTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: ['sts:AssumeRole']
+          Principal:
+            Service: [ecs-tasks.amazonaws.com]
+      ManagedPolicyArns:
+      - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+      Policies: 
+      - PolicyName: TwitterCredentialsPolicy
+        PolicyDocument: 
+          Version: "2012-10-17"
+          Statement:
+          - Effect: Allow
+            Action:
+            - secretsmanager:GetSecretValue
+            Resource:
+            - Fn::ImportValue: !Sub '${Namespace}:ConsumerKey'
+            - Fn::ImportValue: !Sub '${Namespace}:ConsumerSecret'
+            - Fn::ImportValue: !Sub '${Namespace}:AccessToken'
+            - Fn::ImportValue: !Sub '${Namespace}:AccessTokenSecret'
+
+  EcsTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: 
+          - 'sts:AssumeRole'
+          Principal:
+            Service: 
+            - ecs-tasks.amazonaws.com
+      Policies: 
+      - PolicyName: StreamToKinesisPolicy
+        PolicyDocument: 
+          Version: "2012-10-17"
+          Statement:
+          - Effect: Allow
+            Action:
+            - 'firehose:*'
+            Resource: 
+            - Fn::ImportValue: !Sub '${Namespace}:TwitterStreamArn'
+
+
+  EcsPostGisTask:
+    Type: 'AWS::ECS::TaskDefinition'
+    DependsOn: 
+    - LogGroup
+    - EcsTaskRole
+    - EcsTaskExecutionRole
+    Properties:
+      Cpu: 512
+      Memory: 1024
+      NetworkMode: awsvpc
+      TaskRoleArn : !Ref EcsTaskRole
+      ExecutionRoleArn : !Ref EcsTaskExecutionRole
+      RequiresCompatibilities:
+      - FARGATE
+      ContainerDefinitions:
+      - Name: PostGis
+        Image: postgis/postgis:12-3.0-alpine
+        PortMappings:
+        - ContainerPort: 5432
+        environment:
+        - Name: POSTGRES_DB
+          Value: gis
+        - Name: POSTGRES_USER
+          Value: postgres
+        - Name: POSTGRES_PASSWORD
+          Value: 1904geohack!
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-region: !Ref 'AWS::Region'
+            awslogs-group: !Ref LogGroup
+            awslogs-stream-prefix: ecs
+
+
+  EcsGeoserverTask:
+    Type: 'AWS::ECS::TaskDefinition'
+    DependsOn: 
+    - LogGroup
+    - EcsTaskRole
+    - EcsTaskExecutionRole
+    Properties:
+      Cpu: 1024
+      Memory: 4096
+      NetworkMode: awsvpc
+      TaskRoleArn : !Ref EcsTaskRole
+      ExecutionRoleArn : !Ref EcsTaskExecutionRole
+      RequiresCompatibilities:
+      - FARGATE
+      ContainerDefinitions:
+      - Name: Geoserver
+        Image: 1904labs/geoserver:2.17.1
+        PortMappings:
+        - ContainerPort: 8080
+        environment:
+        - Name: GEOSERVER_ADMIN_USER
+          Value: admin
+        - Name: GEOSERVER_ADMIN_PASSWORD
+          Value: 1904geohack!
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-region: !Ref 'AWS::Region'
+            awslogs-group: !Ref LogGroup
+            awslogs-stream-prefix: ecs
+
+
+  EcsWebAppTask:
+    Type: 'AWS::ECS::TaskDefinition'
+    DependsOn: 
+    - LogGroup
+    - EcsTaskRole
+    - EcsTaskExecutionRole
+    Properties:
+      Cpu: 512
+      Memory: 1024
+      NetworkMode: awsvpc
+      TaskRoleArn : !Ref EcsTaskRole
+      ExecutionRoleArn : !Ref EcsTaskExecutionRole
+      RequiresCompatibilities:
+      - FARGATE
+      ContainerDefinitions:
+      - Name: WebApp
+        Image: 1904labs/geohack-collab-project:latest
+        PortMappings:
+        - ContainerPort: 8080
+        environment:
+        - Name: GEOSERVER_URL
+          Value: !!!!!!!!!
+        - Name: GEOSERVER_WORKSPACE
+          Value: geohack
+        - Name: GEOSERVER_ADMIN_USER
+          Value: admin
+        - Name: GEOSERVER_ADMIN_PASSWORD
+          Value: 1904geohack!
+        - Name: POSTGRES_HOST
+          Value: !!!!!!!!!
+        - Name: POSTGRES_PORT
+          Value: 5432
+        - Name: POSTGRES_DB
+          Value: gis
+        - Name: POSTGRES_USER
+          Value: postgres
+        - Name: POSTGRES_PASSWORD
+          Value: 1904geohack!
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-region: !Ref 'AWS::Region'
+            awslogs-group: !Ref LogGroup
+            awslogs-stream-prefix: ecs
+
+  EcsPostGisService:
+    Type: 'AWS::ECS::Service'
+    DependsOn: 
+    - EcsCluster
+    - EcsPostGisTask
+    - ContainerSecurityGroup
+    Properties:
+      Cluster: !Ref EcsCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      SchedulingStrategy: REPLICA
+      ServiceName: PostGisService
+      TaskDefinition: !Ref EcsPostGisTask
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - Fn::ImportValue: !Sub '${Namespace}:PrivateSubnetOne'
+            - Fn::ImportValue: !Sub '${Namespace}:PrivateSubnetTwo'
+          SecurityGroups:
+            - !Ref ContainerSecurityGroup
+      LoadBalancers:
+      - TargetGroupArn: !Ref 'PostGisTargetGroup'
+        ContainerName: PostGis
+        ContainerPort: 5432
+
+
+  EcsGeoServerService:
+    Type: 'AWS::ECS::Service'
+    DependsOn: 
+    - EcsCluster
+    - EcsGeoserverTask
+    - ContainerSecurityGroup
+    Properties:
+      Cluster: !Ref EcsCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      SchedulingStrategy: REPLICA
+      ServiceName: GeoserverService
+      TaskDefinition: !Ref EcsGeoserverTask
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - Fn::ImportValue: !Sub '${Namespace}:PrivateSubnetOne'
+            - Fn::ImportValue: !Sub '${Namespace}:PrivateSubnetTwo'
+          SecurityGroups:
+            - !Ref ContainerSecurityGroup
+      LoadBalancers:
+      - TargetGroupArn: !Ref 'GeoserverTargetGroup'
+        ContainerName: Geoserver
+        ContainerPort: 8080
+
+
+  EcsWebAppService:
+    Type: 'AWS::ECS::Service'
+    DependsOn: 
+    - EcsCluster
+    - EcsWebAppTask
+    - ContainerSecurityGroup
+    Properties:
+      Cluster: !Ref EcsCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      SchedulingStrategy: REPLICA
+      ServiceName: WebAppService
+      TaskDefinition: !Ref EcsWebAppTask
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - Fn::ImportValue: !Sub '${Namespace}:PrivateSubnetOne'
+            - Fn::ImportValue: !Sub '${Namespace}:PrivateSubnetTwo'
+          SecurityGroups:
+            - !Ref ContainerSecurityGroup
+      LoadBalancers:
+      - TargetGroupArn: !Ref 'WebAppTargetGroup'
+        ContainerName: WebApp
+        ContainerPort: 8080
+
+  LoadBalancerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - TargetGroupArn: !Ref 'TargetGroup'
+          Type: 'forward'
+      Conditions:
+        - Field: path-pattern
+          Values: [!Ref 'Path']
+      ListenerArn:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'PublicListener']]
+      Priority: !Ref 'Priority'

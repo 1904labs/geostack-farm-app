@@ -6,7 +6,7 @@ services:
         environment: 
             - POSTGRES_DB=gis
             - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=!geohack!
+            - POSTGRES_PASSWORD=1904geohack!
         volumes:
             - postgresql:/var/lib/postgresql
         ports:
@@ -21,7 +21,7 @@ services:
         image: 1904labs/geoserver:2.17.1
         environment:
             - GEOSERVER_ADMIN_USER=admin
-            - GEOSERVER_ADMIN_PASSWORD=!geohack!
+            - GEOSERVER_ADMIN_PASSWORD=1904geohack!
         volumes:
             - geoserver:/opt/tomcat/webapps/geoserver/data
         ports:
@@ -32,7 +32,7 @@ services:
             timeout: 10s
             retries: 3
 
-    app:
+    webapp:
         image: local/geohack-collab-project:latest
         # uncomment to use development server in container
         # command: ["flask", "run", "--debugger", "--reload", "--host=0.0.0.0", "--port=8080"]
@@ -40,12 +40,12 @@ services:
             - GEOSERVER_URL=http://geoserver:8080 
             - GEOSERVER_WORKSPACE=geohack
             - GEOSERVER_ADMIN_USER=admin
-            - GEOSERVER_ADMIN_PASSWORD=!geohack!
+            - GEOSERVER_ADMIN_PASSWORD=1904geohack!
             - POSTGRES_HOST=postgis
             - POSTGRES_PORT=5432
             - POSTGRES_DB=gis
             - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=!geohack!
+            - POSTGRES_PASSWORD=1904geohack!
         build:
             context: .
         ports:
