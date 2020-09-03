@@ -1,44 +1,25 @@
-import React, { Component } from 'react'
-import { 
-  Map, 
-  Popup, 
-  Controls, 
-  LayerPanel, 
-  loadDataLayer 
-} from '@bayer/ol-kit'
+import React from "react";
+import TopNav from './TopNav'
+import MapView from './MapView'
+import ListView from './ListView'
+import ListItemForm from './ListItemForm'
+import {
+  HashRouter as Router,
+  Route,
+  Switch
+} from "react-router-dom";
 
-class App extends Component {
-
-  addLayerOnLoaded = async (ev) => {
-    const map = this.state.map
-    const fileName =  ev.target.fileName
-    const content = ev.target.result
-    const layer = await loadDataLayer(map, content, { addToMap: false })
-    layer.set('title', fileName)
-    map.addLayer(layer)
-  }
-  
-
-  addLayerFromFile = (file) => {
-    const fileData = new FileReader()
-    fileData.fileName = file.name
-    fileData.onloadend = this.addLayerOnLoaded
-    fileData.readAsText(file)
-  }
-
-  onMapInit = (map) => {
-    this.setState({ map: map });
-  }
-
-  render(){
-    return (
-      <Map onMapInit={this.onMapInit} >
-        <Controls />
-        <Popup />
-        <LayerPanel onFileImport={this.addLayerFromFile} />
-      </Map>
-    )
-  }
+const App = () => {
+  return (
+    <Router>
+        <TopNav/>
+        <Switch>
+          <Route exact path="/" ><MapView /></Route>
+          <Route path="/list"><ListView /></Route>
+          <Route path="/sell"><ListItemForm /></Route>
+        </Switch>
+    </Router>
+  );
 }
 
-export default App
+export default App;

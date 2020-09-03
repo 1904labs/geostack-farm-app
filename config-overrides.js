@@ -1,6 +1,10 @@
 const path = require('path');
+const rewireReactHotLoader = require('react-app-rewire-hot-loader')
 
 module.exports = {
+    config: function (config, env) {        
+  	return rewireReactHotLoader(config, env)
+    },
     paths: function (paths, env) {        
         paths.appSrc = path.resolve(__dirname, 'app/src');
         paths.appBuild = path.resolve(__dirname, 'app/dist');

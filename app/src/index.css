@@ -7,8 +7,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.navbar-dark {
+  background-color:teal;
+  background-image: none;
+  background-repeat: no-repeat;
+ }

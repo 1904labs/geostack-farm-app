@@ -7,7 +7,7 @@ Resources:
     Properties:
       InstanceType: m4.xlarge
       ImageId: ami-08b26b905b0d17561
-      KeyName: hackathon
+      KeyName: 1904key
       SecurityGroups:
       - Ref: SshSecurityGroup
       - Ref: AppSecurityGroup
@@ -17,11 +17,31 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash -xe
           yum update -y
-          yum install -y git
+          yum install -y git ec2-instance-connect
+          curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod 755 /usr/local/bin/docker-compose
           git clone https://github.com/1904labs/geohack-collab-project.git
           cd geohack-collab-project
-          docker-compose build
-          docker-compose up -d
+          /usr/local/bin/docker-compose build
+          /usr/local/bin/docker-compose up -d
+
+  Ec2ConnectPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: Ec2ConnectPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: ec2-instance-connect:SendSSHPublicKey
+            Resource: !Join 
+            - ':'
+            - - arn:aws:ec2 
+              - !Ref AWS::Region
+              - !Ref AWS::AccountId
+              - instance/*
+      Roles:
+      - OrganizationAccountAccessRole
 
   SshSecurityGroup:
     Type: AWS::EC2::SecurityGroup
