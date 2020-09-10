@@ -4,7 +4,6 @@ import {
   Map, 
   Popup, 
   Controls, 
-  LayerPanel, 
   loadDataLayer 
 } from '@bayer/ol-kit'
 
@@ -33,11 +32,10 @@ class MapView extends Component {
 
   render(){
     return (
-      <Map onMapInit={this.onMapInit} >
-        <Controls />
-        <Popup />
-        <LayerPanel onFileImport={this.addLayerFromFile} />
-      </Map>
+        <Map onMapInit={this.onMapInit} className="vw-100 vh-100">
+          <Controls />
+          <Popup />
+        </Map>
     )
   }
 }

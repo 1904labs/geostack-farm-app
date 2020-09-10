@@ -13,6 +13,7 @@ flask-restx = "*"
 pip = "*"
 gunicorn = "*"
 requests = "*"
+ec2instanceconnectcli = "*"
 
 [dev-packages]
 pylint = "*"

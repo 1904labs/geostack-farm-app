@@ -13,7 +13,7 @@ class TopNav extends React.Component {
 
     render(){
         return (
-            <Navbar fixed="top" variant="dark">
+            <Navbar sticky="top" variant="dark">
                 <Navbar.Brand href= "/" >F2C</Navbar.Brand>
                 <Nav className="mr-auto">
                     <Nav.Link href="/">View Map</Nav.Link>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Col, Button } from 'react-bootstrap'
+import { Form, Col, Button, Container } from 'react-bootstrap'
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -51,7 +51,7 @@ const ListItemForm = () => {
     });
     const handleSubmit = values => {alert(JSON.stringify(values, null, 2))}
     return (
-        <div className="d-flex align-items-center flex-column justify-content-center vh-100 bg-dark text-white" >
+        <Container fluid className="d-flex vh-100 pt-25 bg-dark text-white justify-content-center" >
 
             <Form onSubmit={handleSubmit} noValidate>
                 <Form.Group controlId="itemName">
@@ -132,7 +132,7 @@ const ListItemForm = () => {
                 </Form.Group>
                 <Button type="submit">Submit</Button>
             </Form>
-        </div>
+        </Container>
     );
 };
 
