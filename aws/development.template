@@ -41,7 +41,7 @@ Resources:
             chmod +x /usr/local/bin/docker-compose
             usermod -a -G docker ec2-user
             sudo -su ec2-user -- <<EOF
-            git clone git@github.com:${GITHUB_REPOSITORY}.git /home/ec2-user/project
+            git clone https://github.com/${GITHUB_REPOSITORY}.git /home/ec2-user/project
             cd /home/ec2-user/project
             git checkout ${GIT_BRANCH}
             /usr/local/bin/docker-compose up --build -d
