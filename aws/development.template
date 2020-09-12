@@ -1,6 +1,22 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: '1904labs Geospatial Hackathon Cloudformation Template'
+
+Parameters:
+  GITHUBREPO:
+    Description: The owner and repository name. For example, octocat/Hello-World.
+    Type: String
+    Default: 1904labs/geohack-collab-project
+
+  GITBRANCH:
+    Type: String
+    Description: the branch to checkout
+    Default: devel
+
 Resources:
+  ElasticIpv4:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref EC2Instance
 
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -14,34 +30,24 @@ Resources:
       - Ref: GsSecurityGroup
       - Ref: PgSecurityGroup
       UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash -xe
-          yum update -y
-          yum install -y git ec2-instance-connect
-          curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          chmod 755 /usr/local/bin/docker-compose
-          git clone https://github.com/1904labs/geohack-collab-project.git
-          cd geohack-collab-project
-          /usr/local/bin/docker-compose build
-          /usr/local/bin/docker-compose up -d
-
-  Ec2ConnectPolicy:
-    Type: 'AWS::IAM::Policy'
-    Properties:
-      PolicyName: Ec2ConnectPolicy
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: ec2-instance-connect:SendSSHPublicKey
-            Resource: !Join 
-            - ':'
-            - - arn:aws:ec2 
-              - !Ref AWS::Region
-              - !Ref AWS::AccountId
-              - instance/*
-      Roles:
-      - OrganizationAccountAccessRole
+        Fn::Base64:
+          Fn::Sub:
+          - |
+            #!/bin/bash -x
+            yum update -y
+            yum install -y git ec2-instance-connect
+            mkdir -p /usr/local/bin
+            curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+            usermod -a -G docker ec2-user
+            sudo -su ec2-user -- <<EOF
+            git clone git@github.com:${GITHUB_REPOSITORY}.git /home/ec2-user/project
+            cd /home/ec2-user/project
+            git checkout ${GIT_BRANCH}
+            /usr/local/bin/docker-compose up --build -d
+            EOF
+          - GITHUB_REPOSITORY: !Ref GITHUBREPO
+            GIT_BRANCH: !Ref GITBRANCH
 
   SshSecurityGroup:
     Type: AWS::EC2::SecurityGroup

@@ -19,7 +19,8 @@ LABEL maintainer="gjunge@1904labs.com" \
       org.label-schema.docker.cmd="docker run -p 8080:80 -d 1904labs/geohack-collab-project:latest"
 
 RUN set -ex && \
-    apk add --update --no-cache bash nodejs npm &&\
+    apk add --update --no-cache bash nodejs npm libffi-dev && \
+    pip3 install --upgrade pip && \
     pip3 install pipenv
 
 WORKDIR /opt/project

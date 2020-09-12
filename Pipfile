@@ -10,11 +10,13 @@ MarkupSafe = "==1.1.1"
 Werkzeug = "==1.0.1"
 webpack-manifest = "*"
 flask-restx = "*"
-pip = "*"
 gunicorn = "*"
 requests = "*"
-ec2instanceconnectcli = "*"
 
 [dev-packages]
+pip = "*"
+boto3 = "*"
 pylint = "*"
 pycodestyle = "*"
+ec2instanceconnectcli = "*"
+
