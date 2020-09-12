@@ -1,0 +1,40 @@
+name: Deploy To AWS
+
+on:
+  push:
+    branches: [ devel ]
+  pull_request:
+    branches: [ devel ]
+  workflow_dispatch:
+
+jobs:
+  cluster:
+    name: Deploy stack to AWS
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Configure AWS credentials
+      id: creds
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Get branch from ref
+      run: |
+        REF="${{ github.ref }}"
+        GIT_BRANCH=$(basename $REF)
+        echo "::set-env name=GIT_BRANCH::${GIT_BRANCH}"
+    - name: Deploy docker-compose stack
+      id: ec2-compose
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
+      with:
+        name: ec2-deploy
+        template: aws/development.template
+        no-fail-on-empty-changeset: "1"
+        parameter-overrides: >-
+          GITHUBREPO=${{ github.repository }},
+          GITBRANCH=${{ env.GIT_BRANCH }}
