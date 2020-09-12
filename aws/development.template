@@ -15,39 +15,39 @@ Parameters:
 Resources:
   ElasticIpv4:
     Type: AWS::EC2::EIP
-    Properties:
-      InstanceId: !Ref EC2Instance
+  #   Properties:
+  #     InstanceId: !Ref EC2Instance
 
-  EC2Instance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: m4.xlarge
-      ImageId: ami-08b26b905b0d17561
-      KeyName: 1904key
-      SecurityGroups:
-      - Ref: SshSecurityGroup
-      - Ref: AppSecurityGroup
-      - Ref: GsSecurityGroup
-      - Ref: PgSecurityGroup
-      UserData:
-        Fn::Base64:
-          Fn::Sub:
-          - |
-            #!/bin/bash -x
-            yum update -y
-            yum install -y git ec2-instance-connect
-            mkdir -p /usr/local/bin
-            curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
-            usermod -a -G docker ec2-user
-            sudo -su ec2-user -- <<EOF
-            git clone https://github.com/${GITHUB_REPOSITORY}.git /home/ec2-user/project
-            cd /home/ec2-user/project
-            git checkout ${GIT_BRANCH}
-            /usr/local/bin/docker-compose up --build -d
-            EOF
-          - GITHUB_REPOSITORY: !Ref GITHUBREPO
-            GIT_BRANCH: !Ref GITBRANCH
+  # EC2Instance:
+  #   Type: AWS::EC2::Instance
+  #   Properties:
+  #     InstanceType: m4.xlarge
+  #     ImageId: ami-08b26b905b0d17561
+  #     KeyName: 1904key
+  #     SecurityGroups:
+  #     - Ref: SshSecurityGroup
+  #     - Ref: AppSecurityGroup
+  #     - Ref: GsSecurityGroup
+  #     - Ref: PgSecurityGroup
+  #     UserData:
+  #       Fn::Base64:
+  #         Fn::Sub:
+  #         - |
+  #           #!/bin/bash -x
+  #           yum update -y
+  #           yum install -y git ec2-instance-connect
+  #           mkdir -p /usr/local/bin
+  #           curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  #           chmod +x /usr/local/bin/docker-compose
+  #           usermod -a -G docker ec2-user
+  #           sudo -su ec2-user -- <<EOF
+  #           git clone https://github.com/${GITHUB_REPOSITORY}.git /home/ec2-user/project
+  #           cd /home/ec2-user/project
+  #           git checkout ${GIT_BRANCH}
+  #           /usr/local/bin/docker-compose up --build -d
+  #           EOF
+  #         - GITHUB_REPOSITORY: !Ref GITHUBREPO
+  #           GIT_BRANCH: !Ref GITBRANCH
 
   SshSecurityGroup:
     Type: AWS::EC2::SecurityGroup
