@@ -1,39 +1,43 @@
 ---
 title: Geospatial Hackathon Collaborative project
 layout: default
-filename: index.md 
---- 
+filename: index.md
+---
 
-## Prerequisites
-1. pipenv: Install pipenv via the instructions here:
-https://pypi.org/project/pipenv/
-2. node/npm: Install node.js and npm per the instructions here:
-https://www.npmjs.com/get-npm
+## Prerequisites  
+1. pyenv:  
+    1. Install the required build packages here:  
+       https://github.com/pyenv/pyenv/wiki/Common-build-problems  
+    2. Install pyenv via the instructions here:  
+       https://github.com/pyenv/pyenv-installer  
+2. pipenv: Install pipenv via the instructions here:  
+https://pypi.org/project/pipenv/  
+3. node/npm: Install node.js and npm per the instructions here:  
+https://www.npmjs.com/get-npm  
 
 ## Setup  
-__1. clone the repository__
-```bash
-git clone git@github.com:1904labs/geohack-collab-project.git
-```
-
-__2. Install your python environement__
+__1. Install your python environement__
 ```bash
 pipenv install
 ```
 
-__3. Install your node environment__
+__2. Install your node environment__
 ```bash
 npm install
 ```
 
-__4. Build your react app__
+__3. Build your react app__
 ```bash
 npm run build
 ```
 
-__5. Run your app__
-This will lauch the flask dev server on http://localhost:5000
-A browser window should open automatically
+__4. Run the dev server__
+Lauch the webpack dev server on http://localhost:3000  
+A browser window should open automatically  
 ```bash
 npm run start
+```
+Alternately to lauch the flask dev server on http://localhost:5000  
+```bash
+npm run flask
 ```
