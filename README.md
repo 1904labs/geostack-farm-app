@@ -47,23 +47,29 @@ itself resides in the "app" folder and has both a server side component
 and a frontend component. The server side component uses the popular python 
 microframework flask. The frontend uses react.js and utilizes ol-kit for the 
 map component and the bootstrap4 css framework. Relevant links are below:  
-ol-kit: https://ol-kit.com/  
-React: https://reactjs.org/  
-React-Bootstrap: https://react-bootstrap.github.io/  
-Bootstrap: https://getbootstrap.com/docs/4.5/getting-started/introduction/  
-Flask: https://flask.palletsprojects.com/en/1.1.x/  
+- ol-kit: https://ol-kit.com/  
+- React: https://reactjs.org/  
+- React-Bootstrap: https://react-bootstrap.github.io/  
+- Bootstrap: https://getbootstrap.com/docs/4.5/getting-started/introduction/  
+- Flask: https://flask.palletsprojects.com/en/1.1.x/  
 
 ## Docker and docker-compose 
 The Dockerfile file at the root of the project defines an alpine based  container image for the web components of the project.  The docker-compose 
 file utilizes this container image as well as providing a geoserver container
 and a postgis container.  These can be found here:  
-Geoserver: https://github.com/1904labs/docker-geoserver  
-PostGis:  https://github.com/postgis/docker-postgis  
+- Geoserver: 
+  - https://hub.docker.com/r/1904labs/geoserver  
+  - https://github.com/1904labs/docker-geoserver  
+- PostGis:  
+  - https://hub.docker.com/r/postgis/postgis
+  - https://github.com/postgis/docker-postgis  
 
 ## Related  
-This project is derived from this base pattern  
-flask-react-base: https://github.com/1904labs/flask-react-base  
+This project is built from this base    
+- flask-react-base: https://github.com/1904labs/flask-react-base  
 
 The mapview portion started out as a standalone container, it is useful 
 for experimenting with map layers and can be found here: 
-docker-ol-kit: https://github.com/1904labs/docker-ol-kit  
+- docker-ol-kit: 
+  - https://hub.docker.com/r/1904labs/ol-kit  
+  - https://github.com/1904labs/docker-ol-kit  
