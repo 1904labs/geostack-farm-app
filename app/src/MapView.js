@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 
-import { 
-  Map, 
-  Popup, 
-  Controls, 
-  loadDataLayer 
+import {
+  Map,
+  Popup,
+  Controls,
+  loadDataLayer
 } from '@bayer/ol-kit'
 
 class MapView extends Component {
@@ -17,7 +17,7 @@ class MapView extends Component {
     layer.set('title', fileName)
     map.addLayer(layer)
   }
-  
+
 
   addLayerFromFile = (file) => {
     const fileData = new FileReader()
@@ -26,8 +26,17 @@ class MapView extends Component {
     fileData.readAsText(file)
   }
 
+  createUSStatesLayer = async () => {
+    const map = this.state.map
+    const url = window.location.origin + '/api/geoserver/states';
+    const layer = await loadDataLayer(map, url, { addToMap: false })
+    layer.set('title', 'us-states')
+    map.addLayer(layer)
+  }
+
   onMapInit = (map) => {
-    this.setState({ map: map });
+    this.setState({ map: map })
+    this.createUSStatesLayer()
   }
 
   render(){
