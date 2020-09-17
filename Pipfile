@@ -12,6 +12,9 @@ webpack-manifest = "*"
 flask-restx = "*"
 gunicorn = "*"
 requests = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+sqlalchemy-utils = "*"
 
 [dev-packages]
 pip = "*"
@@ -19,4 +22,3 @@ boto3 = "*"
 pylint = "*"
 pycodestyle = "*"
 ec2instanceconnectcli = "*"
-

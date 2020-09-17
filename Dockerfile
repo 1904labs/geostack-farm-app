@@ -16,7 +16,7 @@ LABEL maintainer="gjunge@1904labs.com" \
       org.label-schema.vcs-ref=${VCS_REF} \
       org.label-schema.vendor="1904labs" \
       org.label-schema.version=${BUILD_VERSION} \
-      org.label-schema.docker.cmd="docker run -p 8080:80 -d 1904labs/geohack-collab-project:latest"
+      org.label-schema.docker.cmd="docker run -p 8000:8000 -d 1904labs/geohack-collab-project:latest"
 
 RUN set -ex && \
     apk add --update --no-cache bash nodejs npm libffi-dev && \
@@ -27,18 +27,17 @@ WORKDIR /opt/project
 COPY Pipfile* config-overrides.js *.json ./
 
 # install environments
-RUN pipenv install --deploy --system 
-RUN npm ci 
+RUN pipenv install --deploy --system
+RUN npm ci
 
 # avoid npm builds unless needed
 COPY app/src app/src
 COPY app/public app/public
-RUN ls -R app
-RUN npm run build 
+RUN npm run build
 
 COPY ./ ./
 CMD [ "gunicorn", \
     "app:create_app('production')", \
     "--workers", "15", \
-    "--bind", "0.0.0.0:8080" \
+    "--bind", "0.0.0.0:8000" \
     ]

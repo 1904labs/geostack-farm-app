@@ -1,5 +1,7 @@
-from . import logger
+from typing import Dict
+from .logger import logger
 from .endpoint import GeoserverEndpt
+from .featuretype import GeoserverFeatureType
 
 
 class GeoserverDatastore(GeoserverEndpt):
@@ -25,6 +27,7 @@ class GeoserverDatastore(GeoserverEndpt):
         self.port = port
         self.user = user
         self.pwd = pwd
+        self.featuretypes = {}
 
     def create(self) -> bool:
         data = {"dataStore": {"name": self.name, "connectionParameters": {
@@ -43,3 +46,8 @@ class GeoserverDatastore(GeoserverEndpt):
             return False
         else:
             return True
+
+    def featuretype(self, name: str, data: Dict) -> str:
+        if not self.featuretypes.get(name):
+            self.featuretypes[name] = GeoserverFeatureType(parent=self, name=name, data=data)
+        return self.featuretypes[name]

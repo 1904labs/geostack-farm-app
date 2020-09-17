@@ -3,7 +3,7 @@ version: '3.8'
 services:
     postgis:
         image: postgis/postgis:12-3.0-alpine
-        environment: 
+        environment:
             - POSTGRES_DB=gis
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=1904geohack!
@@ -25,9 +25,9 @@ services:
         volumes:
             - geoserver:/opt/tomcat/webapps/geoserver/data
         ports:
-            - "8081:8080"
+            - "8080:8080"
         healthcheck:
-            test: ["CMD", "curl", "--fail", "http://geoserver:8080/geoserver/"]
+            test: ["CMD", "curl", "--fail", "http://geoserver:8080/web/"]
             interval: 30s
             timeout: 10s
             retries: 3
@@ -35,9 +35,9 @@ services:
     webapp:
         image: local/geohack-collab-project:latest
         # uncomment to use development server in container
-        # command: ["flask", "run", "--debugger", "--reload", "--host=0.0.0.0", "--port=8080"]
+        # command: ["flask", "run", "--debugger", "--reload", "--host=0.0.0.0", "--port=8000"]
         environment:
-            - GEOSERVER_URL=http://geoserver:8080 
+            - GEOSERVER_URL=http://geoserver:8080
             - GEOSERVER_WORKSPACE=geohack
             - GEOSERVER_ADMIN_USER=admin
             - GEOSERVER_ADMIN_PASSWORD=1904geohack!
@@ -49,7 +49,7 @@ services:
         build:
             context: .
         ports:
-            - "8080:8080"
+            - "8000:8000"
 
 volumes:
     postgresql:

@@ -1,5 +1,6 @@
 import requests
 from flask import abort
+from .logger import logger
 from .workspace import GeoserverWorkspace
 
 
@@ -33,14 +34,21 @@ class Geoserver(object):
         if not self.is_alive():
             return abort(400, f"{self.url} is offline")
         url = f"{self.url}/{path}"
-        response = requests.get(url, auth=(self.username, self.password))
+        headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+        response = requests.get(
+            url,
+            headers=headers,
+            auth=(self.username, self.password)
+        )
         return response
 
     def post(self, path: str, data: dict) -> str:
         if not self.is_alive():
             return abort(400, f"{self.url} is offline")
         url = f"{self.url}/{path}"
+        headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
         response = requests.post(
             url, json=data,
+            headers=headers,
             auth=(self.username, self.password))
         return response

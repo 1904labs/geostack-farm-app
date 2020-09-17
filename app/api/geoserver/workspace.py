@@ -1,3 +1,4 @@
+from .logger import logger
 from .endpoint import GeoserverEndpt
 from .datastore import GeoserverDatastore
 
