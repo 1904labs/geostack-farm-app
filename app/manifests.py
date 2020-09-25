@@ -1,8 +1,8 @@
 import os
 import json
 from webpack_manifest.webpack_manifest import (
-    WebpackManifest, 
-    WebpackManifestEntry, 
+    WebpackManifest,
+    WebpackManifestEntry,
     WebpackManifestFileError
 )
 
@@ -15,7 +15,6 @@ class CraManifest(WebpackManifest):
         data = self._read_manifest(path)
         super().__init__(path, data, '/dist/', static_root)
         self.main = WebpackManifestEntry(self._data['entrypoints'], self._static_url, self._static_root)
-
 
     def _read_manifest(self, path):
         if not os.path.isfile(path):
