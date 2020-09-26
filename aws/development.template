@@ -1,16 +1,17 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: '1904labs Geospatial Hackathon Cloudformation Template'
+# aws cloudformation create-stack --stack-name farmapp --template-body file://development.template
 
 Parameters:
   GITHUBREPO:
     Description: The owner and repository name. For example, octocat/Hello-World.
     Type: String
-    Default: 1904labs/geohack-collab-project
+    Default: 1904labs/geostack-farm-app
 
   GITBRANCH:
     Type: String
     Description: the branch to checkout
-    Default: devel
+    Default: master
 
 Resources:
   ElasticIpv4:
@@ -21,7 +22,7 @@ Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: m4.xlarge
+      InstanceType: m4.large
       ImageId: ami-08b26b905b0d17561
       KeyName: 1904key
       SecurityGroups:
@@ -41,10 +42,11 @@ Resources:
             chmod +x /usr/local/bin/docker-compose
             usermod -a -G docker ec2-user
             sudo -su ec2-user -- <<EOF
-            git clone https://github.com/${GITHUB_REPOSITORY}.git /home/ec2-user/project
-            cd /home/ec2-user/project
-            git checkout ${GIT_BRANCH}
-            /usr/local/bin/docker-compose up --build -d
+            # git clone https://github.com/${GITHUB_REPOSITORY}.git /home/ec2-user/project
+            cd /home/ec2-user
+            curl -sSLo docker-compose.yaml https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GIT_BRANCH}/aws/development-compose.yaml
+            # git checkout ${GIT_BRANCH}
+            /usr/local/bin/docker-compose up -d -f ./docker-compose.yaml -f farm-app
             EOF
           - GITHUB_REPOSITORY: !Ref GITHUBREPO
             GIT_BRANCH: !Ref GITBRANCH

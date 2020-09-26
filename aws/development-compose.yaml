@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+    postgis:
+        image: postgis/postgis:12-3.0-alpine
+        environment:
+            - POSTGRES_DB=gis
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=1904geohack!
+        volumes:
+            - postgresql:/var/lib/postgresql
+        ports:
+            - "5432:5432"
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    geoserver:
+        image: 1904labs/geoserver:2.17.1
+        environment:
+            - GEOSERVER_ADMIN_USER=admin
+            - GEOSERVER_ADMIN_PASSWORD=1904geohack!
+        volumes:
+            - geoserver:/opt/tomcat/webapps/ROOT/data
+        ports:
+            - "8080:8080"
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://geoserver:8080/web/"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+
+    webapp:
+        image: 1904labs/geostack-farm-app:latest
+        # uncomment to use development server in container
+        # command: ["flask", "run", "--debugger", "--reload", "--host=0.0.0.0", "--port=8000"]
+        environment:
+            - GEOSERVER_URL=http://geoserver:8080
+            - GEOSERVER_WORKSPACE=geohack
+            - GEOSERVER_ADMIN_USER=admin
+            - GEOSERVER_ADMIN_PASSWORD=1904geohack!
+            - POSTGRES_URI=postgres://postgres:1904geohack!@postgis:5432/gis
+        ports:
+            - "8000:8000"
+
+volumes:
+    postgresql:
+    geoserver:
