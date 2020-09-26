@@ -42,11 +42,11 @@ Resources:
             chmod +x /usr/local/bin/docker-compose
             usermod -a -G docker ec2-user
             sudo -su ec2-user -- <<EOF
-            # git clone https://github.com/${GITHUB_REPOSITORY}.git /home/ec2-user/project
-            cd /home/ec2-user
-            curl -sSLo docker-compose.yaml https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GIT_BRANCH}/aws/development-compose.yaml
-            # git checkout ${GIT_BRANCH}
-            /usr/local/bin/docker-compose up -d -f ./docker-compose.yaml -f farm-app
+            mkdir -p /home/user/farm-app
+            git clone https://github.com/${GITHUB_REPOSITORY}.git /home/ec2-user/farm-app
+            git checkout ${GIT_BRANCH}
+            cd /home/ec2-user/farm-app
+            /usr/local/bin/docker-compose -f ./aws/development-compose.yaml -p farm-app up -d
             EOF
           - GITHUB_REPOSITORY: !Ref GITHUBREPO
             GIT_BRANCH: !Ref GITBRANCH
